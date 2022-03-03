@@ -4,8 +4,8 @@ header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 session_name("sistema-barberia");
-/* session_start();
- */
+session_start();
+
 error_reporting(E_ERROR | E_PARSE );
 
 require_once("configuracion.php");

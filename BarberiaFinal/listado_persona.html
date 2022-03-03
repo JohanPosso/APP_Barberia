@@ -96,9 +96,244 @@
      
       
       function crear_listar(item, index, arr) {
-        html_lista+='<li class="list-group-item">'+item.nombre+'<hr><button class="badge badge-danger badge-pill" onclick="eliminar('+item.id_persona+')">Eliminar</button>  <a class="badge badge-primary badge-pill" href="editar_persona.html?id='+item.id_persona+'" >Modificar</a> </li>';
+        html_lista+=`
+                        <tr class="container">
+                            <th scope="row">${i++}</th>
+                            <td>${item.nombre_completo}</td>
+                            <td>${item.cargo}</td>
+                              <td>
+                                <i class="bi bi-trash"  onclick="eliminar(${item.id_persona})"></i>
+                                <i class="bi bi-pencil-square " data-bs-toggle="modal" data-bs-target="#ModalPersonas" 
+                                onClick="set_informacion()"
+                                data-nombre="${item.nombre}"
+                                data-telefono="${item.telefono}"
+                                data-email="${item.email}"
+                                data-id_cargo="${item.id_cargo}"
+                                data-apellido="${item.apellido}" 
+                                data-id="${item.id_persona}" 
+                                data-numero_documento="${item.numero_documento}" 
+                                data-id_tipo_documento="${item.id_tipo_documento}" 
+
+                                ></i>
+                            </td>
+                        </tr>       
+                        `;
       }
 
+       /* Listar tipos de documentos en el  select */
+
+       function get_tipos_documentos() {
+            $.ajax({
+                url: base_url + "get_tipos_documentos",
+                type: "POST",
+                dataType: "json",
+                data: {},
+            })
+                .done(function (r) {
+                    let data = r.data;
+                    data.forEach(listar_tipos_documentos);
+                    document.querySelector('#id_tipo_documento').insertAdjacentHTML('beforeend',html_select_tipo_documento)
+
+                  
+                })
+                .fail(function (error) {
+                    console.log(error);
+                })
+        }
+        function listar_tipos_documentos(item, index, arr) {
+            html_select_tipo_documento += `
+            <option value="${item.id_tipo_documento}">${item.nombre}</option>
+                        `;
+        }
+
+
+               /* Listar tipos de cargos get_cargos en el  select */
+
+               function get_cargos() {
+            $.ajax({
+                url: base_url + "get_cargos",
+                type: "POST",
+                dataType: "json",
+                data: {},
+            })
+                .done(function (r) {
+                    let data = r.data;
+                    data.forEach(listar_get_cargos);
+                    document.querySelector('#id_cargo').insertAdjacentHTML('beforeend',html_select_cargo)
+
+                })
+                .fail(function (error) {
+                    console.log(error);
+                })
+        }
+        function listar_get_cargos(item, index, arr) {
+            html_select_cargo += `
+            <option value="${item.id_cargo}">${item.nombre}</option>
+                        `;
+        }
+
+
+
+        /* Registrar datos */
+
+        function registrar() {
+
+            $.ajax({
+                url: base_url + "registrar",
+                type: "POST",
+                dataType: "json",
+                data: $("#formulario").serialize(),
+            
+            })
+               
+                .done(function (r) {
+                    var divError = document.querySelectorAll('#formulario .error')
+                    let inpus = document.querySelectorAll('#formulario .focus')     
+                    let objet= r.errors;
+                    if (r.error == true) {
+
+                        for (const item in objet) {
+             document.querySelector(`#${item}`).nextElementSibling.innerHTML = objet[item].required;
+                        }
+                        
+                        inpus.forEach(element =>
+                            element.addEventListener('focus', (e) => {
+                                divError.forEach(element => element.textContent = "")
+                            })
+                        )
+                    } else {
+                        i = 1
+                        html_lista = "";
+                        document.querySelector('.texto-exito').textContent = "Fue agregado con exito";
+                        setTimeout(showMessage, 1000)
+                    }
+                })
+                .fail(function (r) {
+                    console.log("error");
+                    console.log(r)
+
+                })
+        }
+
+        /* Eliminar datos */
+        function eliminar(id) {
+
+            if (!confirm("Realmente desea modificar el registro seleccionado?"))
+                return;
+            $.ajax({
+                url: base_url + "eliminar",
+                type: "POST",
+                dataType: "json",
+                data: { id: id },
+            })
+
+                .done(function (r) {
+                    html_lista = "";
+                    i = 1;
+                    document.querySelector('.texto-exito').textContent = "Fue Eliminado con exito";
+                    setTimeout(showMessage, 1000)
+                    console.log(r)
+                })
+                .fail(function (r) {
+                    console.log("error");
+                    console.log(r)
+
+                })
+        }
+
+        /* Agrega la informatión al formulario */
+        function set_informacion() {
+            var divError = document.querySelectorAll('#formulario .error')
+
+        divError.forEach(element =>
+             element.textContent = ""
+            )
+
+            $(".btn-registrar").hide();
+            $(".btn-modificar").show();
+            const e = event.target;
+            let id = e.getAttribute("data-id");
+            let nombre = e.getAttribute("data-nombre");
+            let apellido = e.getAttribute("data-apellido");
+            let numero_documento = e.getAttribute("data-numero_documento");
+            let email = e.getAttribute("data-email");
+            let telefono = e.getAttribute("data-telefono");
+            let id_cargo = e.getAttribute("data-id_cargo");
+            let id_tipo_documento = e.getAttribute("data-id_tipo_documento");
+
+
+            $("#nombre").val(nombre);
+            $("#id").val(id);
+            $("#apellido").val(apellido);
+            $("#numero_documento").val(numero_documento);
+            $("#email").val(email);
+            $("#telefono").val(telefono);
+            $("#id_cargo").val(id_cargo);
+            $("#id_tipo_documento").val(id_tipo_documento);
+
+        }
+
+
+        /* btn para mostrar el modal para registrar */
+        btnAgregar = () => {
+            var divError = document.querySelectorAll('#formulario .error')
+
+divError.forEach(element =>
+    element.textContent = ""
+)
+
+            $(".btn-registrar").show();
+            $(".btn-modificar").hide();
+            $("#formulario").trigger("reset")
+        }
+
+        function editar() {
+
+            if (!confirm("Realmente desea modificar el registro seleccionado?"))
+                return;
+
+            $.ajax({
+                url: base_url + 'actualizar',
+                type: 'POST',
+                dataType: 'json',
+                data: $("#formulario").serialize(),
+            })
+                .done(function (r) {
+                    var divError = document.querySelectorAll('#formulario .error')
+                    let inpus = document.querySelectorAll('#formulario .focus')     
+                    let objet= r.errors;
+                    if (r.error == true) {
+
+                        for (const item in objet) {
+             document.querySelector(`#${item}`).nextElementSibling.innerHTML = objet[item].required;
+                        }
+                        
+                        inpus.forEach(element =>
+                            element.addEventListener('focus', (e) => {
+                                divError.forEach(element => element.textContent = "")
+                            })
+                        )
+                    } else {
+                        i = 1
+                        html_lista = "";
+                        document.querySelector('.texto-exito').textContent = "Fue editado con exito";
+                        setTimeout(showMessage, 1000)
+                    }
+                })
+                .fail(function (r) {
+                    console.log("error al editar");
+
+                })
+        }
+
+
+        /*  funcines para mostrar  y ocultar mensaje de exito */
+        function showMessage() {
+            document.querySelector('.mensaje-exito').classList.add("activo")
+            setTimeout(hideMessage, 1000)
+            listar()
+        }
+        function hideMessage() { document.querySelector('.mensaje-exito').classList.remove("activo") }
 
     </script>
 

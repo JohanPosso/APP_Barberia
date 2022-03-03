@@ -8,7 +8,9 @@ include_once ("externos.php");
 include_once ("php/validation.php");
 
 class formulario extends Base {
+
   
+
   function validar_registrar(){
     $v = new Validation($_POST);
     $v->addRules('nombre', 'Nombre', array('required' => true) );
@@ -70,25 +72,13 @@ class formulario extends Base {
   }
 
 
+
   // PERMITE LISTAR LOS ELEMENTOS DE LA BASE DE DATOS
   function listar(){
-    //$this->validar();
+     //$this->validar();
+  
     $sql = "SELECT * FROM cargo WHERE visible=1";
     $data = $this->db->select_all($sql);
-
-    $result = array();
-    $result['msg']='ok';
-    $result['data']=$data;
-    $result['error']=false;
-    echo json_encode($result);
-  }
-
-
-   function get_informacion(){
-    //$this->validar();
-    $ide = $_GET['id'];
-    $sql = "SELECT * FROM cargo WHERE id_cargo='$ide'";
-    $data = $this->db->select_row($sql);
 
     $result = array();
     $result['msg']='ok';
@@ -100,9 +90,12 @@ class formulario extends Base {
   // PERMITE REGISTRAR LOS ELEMENTO A LA BASE DE DATOS
   function registrar(){
     $this->validar_registrar();
+  
     $insert = $_POST;
-    $insert['visible']=1;
-    $insert['fechar']=date("Y-m-d H:i:s");
+    unset($insert['id']); // SE ELIMINA LA ID
+
+    $insert['visible'] = 1;
+    $insert['fechar'] = date("y-m-d h:i:s");
 
     $this->db->insert("cargo",$insert);
 
@@ -115,7 +108,8 @@ class formulario extends Base {
 
   // PERMITE REGISTRAR LOS ELEMENTO A LA BASE DE DATOS
   function actualizar(){
-    $this->validar_modificar(); 
+    $this->validar_modificar();
+
     $idu = $_POST['id'];
     $update = $_POST;
     unset($update['id']); // SE ELIMINA LA ID
@@ -131,11 +125,13 @@ class formulario extends Base {
 
 
   function eliminar(){
-     $this->validar_eliminar(); 
+    $this->validar_eliminar();
+
+    
     $ide = $_POST['id'];
     $update = array();
     $update['visible']=2;
-    $this->db->update("cargo",$update,array('id_cargo'=>$ide));
+    $this->db->update("cargo",$update,array('id_cargo'=>$ide)); 
 
     $result = array();
     $result['msg']='Registro eliminado';
@@ -145,6 +141,8 @@ class formulario extends Base {
   }
 
 }
+
+
 
 // Recibir por GET
 $accion  = $_GET['accion'];

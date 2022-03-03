@@ -111,16 +111,19 @@ function getParameterByName(name) {
 
 
       
-        <form id="formulario" style="margin:auto; width: 90%">
-          <input type="hidden" class="form-control" id="id" name="id">
-           <div class="form-group">
-           <label for="nombre">Nombre</label>
-           <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese nombre">
-           <small id="emailHelp" class="form-text text-muted">Por favor ingresar nombre del servicio</small>
-           </div>
+<br><br>
+<form id="formulario" style="margin:auto; width: 90%">
+   <div class="form-group">
+   <label for="nombre">Nombre</label>
+   <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese nombre">
+   <label for="nombre">Precio</label>
+   <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Precio">
+   <label for="nombre">Duracion</label>
+   <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Duracion">
+   </div>
 
-            <button type="button" class="btn btn-success w-100" onclick="editar()">Actualizar</button>
-        </form>
+    <button type="button" class="btn btn-success w-100" onclick="registrar()">Actualizar</button>
+</form>
         <!-- lll -->
  
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
